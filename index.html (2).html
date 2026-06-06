@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIToolBox - Free AI Tools Online</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --card: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #6c63ff;
+    --accent2: #00d4aa;
+    --text: #e8e8f0;
+    --muted: #888899;
+    --danger: #ff4e6a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,15,0.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 60px;
+  }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--accent); letter-spacing: -0.5px; }
+  .logo span { color: var(--accent2); }
+  .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--text); }
+
+  /* HERO */
+  .hero {
+    text-align: center; padding: 5rem 2rem 3rem;
+    background: radial-gradient(ellipse at 50% 0%, rgba(108,99,255,0.15) 0%, transparent 70%);
+  }
+  .hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 800; line-height: 1.1; margin-bottom: 1rem; }
+  .hero h1 span { color: var(--accent); }
+  .hero p { color: var(--muted); font-size: 1.1rem; max-width: 500px; margin: 0 auto 2rem; }
+  .badge { display: inline-block; background: rgba(108,99,255,0.15); border: 1px solid rgba(108,99,255,0.3); color: var(--accent); padding: 0.3rem 0.9rem; border-radius: 20px; font-size: 0.8rem; margin-bottom: 1rem; }
+
+  /* AD ZONE */
+  .ad-zone {
+    background: var(--surface); border: 1px dashed var(--border);
+    text-align: center; color: var(--muted); font-size: 0.75rem;
+    padding: 1rem; margin: 1rem auto; max-width: 728px; border-radius: 8px;
+  }
+
+  /* TOOLS GRID */
+  .tools-section { padding: 2rem; max-width: 1100px; margin: 0 auto; }
+  .section-title { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem; }
+  .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+
+  .tool-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 1.5rem; cursor: pointer;
+    transition: all 0.25s; position: relative; overflow: hidden;
+  }
+  .tool-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(108,99,255,0.05), transparent);
+    opacity: 0; transition: opacity 0.25s;
+  }
+  .tool-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 8px 30px rgba(108,99,255,0.15); }
+  .tool-card:hover::before { opacity: 1; }
+  .tool-icon { font-size: 2rem; margin-bottom: 0.8rem; }
+  .tool-card h3 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
+  .tool-card p { color: var(--muted); font-size: 0.85rem; line-height: 1.5; }
+  .tool-tag { display: inline-block; background: rgba(0,212,170,0.1); color: var(--accent2); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 10px; margin-top: 0.8rem; }
+
+  /* TOOL PAGE */
+  .tool-page { display: none; max-width: 800px; margin: 0 auto; padding: 2rem; }
+  .tool-page.active { display: block; }
+  .back-btn {
+    background: none; border: 1px solid var(--border); color: var(--muted);
+    padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.85rem;
+    margin-bottom: 1.5rem; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+  }
+  .back-btn:hover { border-color: var(--accent); color: var(--text); }
+  .tool-page h2 { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .tool-page .desc { color: var(--muted); margin-bottom: 1.5rem; }
+
+  textarea, input[type="text"], input[type="number"] {
+    width: 100%; background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); padding: 1rem; border-radius: 10px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem; resize: vertical; outline: none; transition: border 0.2s;
+  }
+  textarea:focus, input:focus { border-color: var(--accent); }
+  textarea { min-height: 160px; }
+
+  .run-btn {
+    background: var(--accent); color: white; border: none;
+    padding: 0.8rem 2rem; border-radius: 10px; font-size: 1rem;
+    font-family: 'Syne', sans-serif; font-weight: 700; cursor: pointer;
+    margin-top: 1rem; transition: all 0.2s; width: 100%;
+  }
+  .run-btn:hover { background: #5a52e0; transform: translateY(-1px); }
+  .run-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .output-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.2rem; margin-top: 1.2rem;
+    min-height: 100px; font-size: 0.95rem; line-height: 1.7;
+    white-space: pre-wrap; display: none;
+  }
+  .output-box.visible { display: block; }
+  .loading { color: var(--accent); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  .word-stats { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
+  .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.5rem; text-align: center; flex: 1; min-width: 100px; }
+  .stat-box .num { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--accent); }
+  .stat-box .lbl { color: var(--muted); font-size: 0.8rem; }
+
+  label { display: block; color: var(--muted); font-size: 0.85rem; margin-bottom: 0.4rem; margin-top: 1rem; }
+
+  /* FOOTER */
+  footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 4rem; }
+  footer a { color: var(--muted); text-decoration: none; margin: 0 0.5rem; }
+  footer a:hover { color: var(--text); }
+
+  /* PAGES */
+  .static-page { display: none; max-width: 700px; margin: 0 auto; padding: 2rem; }
+  .static-page.active { display: block; }
+  .static-page h2 { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; margin-bottom: 1rem; }
+  .static-page p, .static-page li { color: var(--muted); line-height: 1.8; margin-bottom: 0.8rem; }
+  .static-page h3 { font-family: 'Syne', sans-serif; margin: 1.5rem 0 0.5rem; color: var(--text); }
+
+  #home-section { display: block; }
+
+  .copy-btn {
+    background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+    padding: 0.4rem 0.9rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem;
+    float: right; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+  }
+  .copy-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  @media(max-width:600px) {
+    .nav-links { display: none; }
+    .hero h1 { font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">AI<span>ToolBox</span></div>
+  <ul class="nav-links">
+    <li><a href="#" onclick="showSection('home')">Home</a></li>
+    <li><a href="#" onclick="showSection('about')">About</a></li>
+    <li><a href="#" onclick="showSection('contact')">Contact</a></li>
+    <li><a href="#" onclick="showSection('privacy')">Privacy</a></li>
+  </ul>
+</nav>
+
+<!-- HOME -->
+<div id="home-section">
+  <div class="hero">
+    <div class="badge">✨ 8 Free AI Tools</div>
+    <h1>Your Free <span>AI Toolbox</span><br>For Everything</h1>
+    <p>Summarize, paraphrase, write essays, check grammar and more — all powered by AI, completely free.</p>
+  </div>
+
+  <!-- Ad Zone Top -->
+  <div class="ad-zone">Advertisement (728×90) — AdSense code goes here</div>
+
+  <div class="tools-section">
+    <div class="section-title">🧰 All Tools</div>
+    <div class="tools-grid">
+      <div class="tool-card" onclick="openTool('summarizer')">
+        <div class="tool-icon">📝</div>
+        <h3>Text Summarizer</h3>
+        <p>Paste any long text and get a short, clear summary instantly.</p>
+        <span class="tool-tag">AI Powered</span>
+      </div>
+      <div class="tool-card" onclick="openTool('paraphraser')">
+        <div class="tool-icon">🔄</div>
+        <h3>Paraphraser</h3>
+        <p>Rewrite any text in a fresh way while keeping the same meaning.</p>
+        <span class="tool-tag">AI Powered</span>
+      </div>
+      <div class="tool-card" onclick="openTool('grammar')">
+        <div class="tool-icon">✅</div>
+        <h3>Grammar Checker</h3>
+        <p>Fix grammar, spelling, and punctuation errors in your text.</p>
+        <span class="tool-tag">AI Powered</span>
+      </div>
+      <div class="tool-card" onclick="openTool('wordcount')">
+        <div class="tool-icon">📄</div>
+        <h3>Word Counter</h3>
+        <p>Count words, characters, sentences and reading time instantly.</p>
+        <span class="tool-tag">Instant</span>
+      </div>
+      <div class="tool-card" onclick="openTool('essay')">
+        <div class="tool-icon">📚</div>
+        <h3>Essay Writer</h3>
+        <p>Enter a topic and get a full well-structured essay written by AI.</p>
+        <span class="tool-tag">AI Powered</span>
+      </div>
+      <div class="tool-card" onclick="openTool('quiz')">
+        <div class="tool-icon">❓</div>
+        <h3>Quiz Maker</h3>
+        <p>Generate quiz questions from any topic or text automatically.</p>
+        <span class="tool-tag">AI Powered</span>
+      </div>
+      <div class="tool-card" onclick="openTool('chat')">
+        <div class="tool-icon">💡</div>
+        <h3>AI Chat Assistant</h3>
+        <p>Ask anything and get smart, detailed answers from AI.</p>
+        <span class="tool-tag">AI Powered</span>
+      </div>
+      <div class="tool-card" onclick="openTool('email')">
+        <div class="tool-icon">📧</div>
+        <h3>Email Writer</h3>
+        <p>Write professional emails in seconds — just describe what you need.</p>
+        <span class="tool-tag">AI Powered</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ad Zone Bottom -->
+  <div class="ad-zone" style="margin: 2rem auto;">Advertisement (728×90) — AdSense code goes here</div>
+</div>
+
+<!-- TOOL PAGES -->
+<!-- Summarizer -->
+<div id="tool-summarizer" class="tool-page">
+  <button class="back-btn" onclick="closeTool()">← Back to Tools</button>
+  <div class="ad-zone">Advertisement — AdSense code goes here</div>
+  <h2>📝 Text Summarizer</h2>
+  <p class="desc">Paste any long article, essay, or document and get a concise summary.</p>
+  <label>Your Text</label>
+  <textarea id="summarizer-input" placeholder="Paste your long text here..."></textarea>
+  <button class="run-btn" onclick="runTool('summarizer')">Summarize Now</button>
+  <div id="summarizer-output" class="output-box">
+    <button class="copy-btn" onclick="copyOutput('summarizer-output')">Copy</button>
+    <span id="summarizer-result"></span>
+  </div>
+</div>
+
+<!-- Paraphraser -->
+<div id="tool-paraphraser" class="tool-page">
+  <button class="back-btn" onclick="closeTool()">← Back to Tools</button>
+  <div class="ad-zone">Advertisement — AdSense code goes here</div>
+  <h2>🔄 Paraphraser</h2>
+  <p class="desc">Rewrite your text in a new way while keeping the original meaning.</p>
+  <label>Your Text</label>
+  <textarea id="paraphraser-input" placeholder="Enter text to paraphrase..."></textarea>
+  <button class="run-btn" onclick="runTool('paraphraser')">Paraphrase Now</button>
+  <div id="paraphraser-output" class="output-box">
+    <button class="copy-btn" onclick="copyOutput('paraphraser-output')">Copy</button>
+    <span id="paraphraser-result"></span>
+  </div>
+</div>
+
+<!-- Grammar -->
+<div id="tool-grammar" class="tool-page">
+  <button class="back-btn" onclick="closeTool()">← Back to Tools</button>
+  <div class="ad-zone">Advertisement — AdSense code goes here</div>
+  <h2>✅ Grammar Checker</h2>
+  <p class="desc">Fix all grammar, spelling and punctuation mistakes in your text.</p>
+  <label>Your Text</label>
+  <textarea id="grammar-input" placeholder="Enter your text to check..."></textarea>
+  <button class="run-btn" onclick="runTool('grammar')">Check Grammar</button>
+  <div id="grammar-output" class="output-box">
+    <button class="copy-btn" onclick="copyOutput('grammar-output')">Copy</button>
+    <span id="grammar-result"></span>
+  </div>
+</div>
+
+<!-- Word Counter -->
+<div id="tool-wordcount" class="tool-page">
+  <button class="back-btn" onclick="closeTool()">← Back to Tools</button>
+  <h2>📄 Word Counter</h2>
+  <p class="desc">Instantly count words, characters, sentences and estimated reading time.</p>
+  <label>Your Text</label>
+  <textarea id="wordcount-input" placeholder="Start typing or paste your text here..." oninput="updateWordCount()"></textarea>
+  <div class="word-stats">
+    <div class="stat-box"><div class="num" id="wc-words">0</div><div class="lbl">Words</div></div>
+    <div class="stat-box"><div class="num" id="wc-chars">0</div><div class="lbl">Characters</div></div>
+    <div class="stat-box"><div class="num" id="wc-sentences">0</div><div class="lbl">Sentences</div></div>
+    <div class="stat-box"><div class="num" id="wc-read">0</div><div class="lbl">Min Read</div></div>
+  </div>
+</div>
+
+<!-- Essay Writer -->
+<div id="tool-essay" class="tool-page">
+  <button class="back-btn" onclick="closeTool()">← Back to Tools</button>
+  <div class="ad-zone">Advertisement — AdSense code goes here</div>
+  <h2>📚 Essay Writer</h2>
+  <p class="desc">Enter any topic and get a complete, well-structured essay.</p>
+  <label>Essay Topic</label>
+  <input type="text" id="essay-input" placeholder="e.g. Climate Change and its effects on biodiversity">
+  <label>Essay Length</label>
+  <select id="essay-length" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:0.8rem;border-radius:10px;font-family:'DM Sans',sans-serif;outline:none;">
+    <option value="short">Short (300 words)</option>
+    <option value="medium" selected>Medium (600 words)</option>
+    <option value="long">Long (1000 words)</option>
+  </select>
+  <button class="run-btn" onclick="runTool('essay')">Write Essay</button>
+  <div id="essay-output" class="output-box">
+    <button class="copy-btn" onclick="copyOutput('essay-output')">Copy</button>
+    <span id="essay-result"></span>
+  </div>
+</div>
+
+<!-- Quiz Maker -->
+<div id="tool-quiz" class="tool-page">
+  <button class="back-btn" onclick="closeTool()">← Back to Tools</button>
+  <div class="ad-zone">Advertisement — AdSense code goes here</div>
+  <h2>❓ Quiz Maker</h2>
+  <p class="desc">Generate multiple choice quiz questions from any topic or text.</p>
+  <label>Topic or Text</label>
+  <textarea id="quiz-input" placeholder="Enter a topic like 'World War 2' or paste any text..."></textarea>
+  <label>Number of Questions</label>
+  <input type="number" id="quiz-num" value="5" min="3" max="10">
+  <button class="run-btn" onclick="runTool('quiz')">Generate Quiz</button>
+  <div id="quiz-output" class="output-box">
+    <button class="copy-btn" onclick="copyOutput('quiz-output')">Copy</button>
+    <span id="quiz-result"></span>
+  </div>
+</div>
+
+<!-- AI Chat -->
+<div id="tool-chat" class="tool-page">
+  <button class="back-btn" onclick="closeTool()">← Back to Tools</button>
+  <div class="ad-zone">Advertisement — AdSense code goes here</div>
+  <h2>💡 AI Chat Assistant</h2>
+  <p class="desc">Ask anything — get smart, detailed answers instantly.</p>
+  <label>Your Question</label>
+  <textarea id="chat-input" placeholder="Ask me anything..."></textarea>
+  <button class="run-btn" onclick="runTool('chat')">Ask AI</button>
+  <div id="chat-output" class="output-box">
+    <button class="copy-btn" onclick="copyOutput('chat-output')">Copy</button>
+    <span id="chat-result"></span>
+  </div>
+</div>
+
+<!-- Email Writer -->
+<div id="tool-email" class="tool-page">
+  <button class="back-btn" onclick="closeTool()">← Back to Tools</button>
+  <div class="ad-zone">Advertisement — AdSense code goes here</div>
+  <h2>📧 Email Writer</h2>
+  <p class="desc">Describe your email need and get a professional email instantly.</p>
+  <label>What do you need to write?</label>
+  <textarea id="email-input" placeholder="e.g. Write a professional email to my professor asking for assignment deadline extension"></textarea>
+  <button class="run-btn" onclick="runTool('email')">Write Email</button>
+  <div id="email-output" class="output-box">
+    <button class="copy-btn" onclick="copyOutput('email-output')">Copy</button>
+    <span id="email-result"></span>
+  </div>
+</div>
+
+<!-- ABOUT PAGE -->
+<div id="about-section" class="static-page">
+  <button class="back-btn" onclick="showSection('home')">← Back to Home</button>
+  <h2>About AIToolBox</h2>
+  <p>AIToolBox is a free collection of AI-powered tools designed to help students, professionals, and everyday users get things done faster. From summarizing long articles to writing professional emails, our tools are built to save you time.</p>
+  <h3>Our Mission</h3>
+  <p>We believe powerful AI tools should be accessible to everyone — for free. No sign-up, no subscription, just open and use.</p>
+  <h3>What We Offer</h3>
+  <p>8 free AI tools including Text Summarizer, Paraphraser, Grammar Checker, Word Counter, Essay Writer, Quiz Maker, AI Chat Assistant, and Email Writer.</p>
+  <h3>Contact Us</h3>
+  <p>Have feedback or suggestions? Visit our <a href="#" onclick="showSection('contact')" style="color:var(--accent)">Contact page</a>.</p>
+</div>
+
+<!-- CONTACT PAGE -->
+<div id="contact-section" class="static-page">
+  <button class="back-btn" onclick="showSection('home')">← Back to Home</button>
+  <h2>Contact Us</h2>
+  <p>We'd love to hear from you! Whether you have a suggestion, found a bug, or just want to say hello — reach out.</p>
+  <h3>Email</h3>
+  <p>📧 contact@aitoolbox.site</p>
+  <h3>Response Time</h3>
+  <p>We typically respond within 24–48 hours.</p>
+  <h3>Feedback</h3>
+  <p>If a tool isn't working correctly or you'd like to see a new tool added, please email us with details. We read every message.</p>
+</div>
+
+<!-- PRIVACY PAGE -->
+<div id="privacy-section" class="static-page">
+  <button class="back-btn" onclick="showSection('home')">← Back to Home</button>
+  <h2>Privacy Policy</h2>
+  <p><strong>Last updated: June 2025</strong></p>
+  <p>At AIToolBox, we take your privacy seriously. This policy explains how we handle your data.</p>
+  <h3>Data Collection</h3>
+  <p>We do not collect or store any personal data. Text you enter into our tools is sent to the AI API for processing and is not saved on our servers.</p>
+  <h3>Cookies</h3>
+  <p>We use cookies for analytics and advertising purposes (Google AdSense). You can disable cookies in your browser settings at any time.</p>
+  <h3>Google AdSense</h3>
+  <p>We use Google AdSense to display ads. Google may use cookies to show relevant ads based on your browsing activity. You can opt out via Google's ad settings.</p>
+  <h3>Third-Party Services</h3>
+  <p>Our tools use the Anthropic Claude API to process text. Please refer to Anthropic's privacy policy for details on how they handle API requests.</p>
+  <h3>Contact</h3>
+  <p>For privacy concerns, email us at: contact@aitoolbox.site</p>
+</div>
+
+<footer>
+  <p>© 2025 AIToolBox — Free AI Tools Online</p>
+  <br>
+  <a href="#" onclick="showSection('about')">About</a>
+  <a href="#" onclick="showSection('contact')">Contact</a>
+  <a href="#" onclick="showSection('privacy')">Privacy Policy</a>
+</footer>
+
+<script>
+const API_KEY = "YOUR_ANTHROPIC_API_KEY"; // Replace with your key
+
+const prompts = {
+  summarizer: (text) => `Summarize the following text in clear, concise bullet points:\n\n${text}`,
+  paraphraser: (text) => `Paraphrase the following text. Keep the same meaning but use different words and sentence structure:\n\n${text}`,
+  grammar: (text) => `Check and correct all grammar, spelling, and punctuation errors in the following text. Return only the corrected version:\n\n${text}`,
+  essay: (text) => {
+    const len = document.getElementById('essay-length').value;
+    const words = len === 'short' ? 300 : len === 'medium' ? 600 : 1000;
+    return `Write a well-structured essay of approximately ${words} words on the topic: "${text}". Include an introduction, body paragraphs, and conclusion.`;
+  },
+  quiz: (text) => {
+    const num = document.getElementById('quiz-num').value;
+    return `Generate ${num} multiple choice quiz questions about: "${text}". Format each question with 4 options (A, B, C, D) and mark the correct answer.`;
+  },
+  chat: (text) => `${text}`,
+  email: (text) => `Write a professional email for the following request: "${text}". Include Subject line, greeting, body, and sign-off.`
+};
+
+async function runTool(tool) {
+  const inputEl = document.getElementById(`${tool}-input`);
+  const outputEl = document.getElementById(`${tool}-output`);
+  const resultEl = document.getElementById(`${tool}-result`);
+  const btn = outputEl.previousElementSibling;
+
+  const input = inputEl.value.trim();
+  if (!input) { alert('Please enter some text first!'); return; }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Processing...';
+  outputEl.classList.add('visible');
+  resultEl.innerHTML = '<span class="loading">AI is thinking...</span>';
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        messages: [{ role: "user", content: prompts[tool](input) }]
+      })
+    });
+    const data = await response.json();
+    const text = data.content?.[0]?.text || "Something went wrong. Please try again.";
+    resultEl.textContent = text;
+  } catch (err) {
+    resultEl.textContent = "Error connecting to AI. Please try again.";
+  }
+
+  btn.disabled = false;
+  btn.textContent = getBtnLabel(tool);
+}
+
+function getBtnLabel(tool) {
+  const labels = { summarizer: 'Summarize Now', paraphraser: 'Paraphrase Now', grammar: 'Check Grammar', essay: 'Write Essay', quiz: 'Generate Quiz', chat: 'Ask AI', email: 'Write Email' };
+  return labels[tool] || 'Run';
+}
+
+function updateWordCount() {
+  const text = document.getElementById('wordcount-input').value;
+  const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+  const chars = text.length;
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim()).length;
+  const readTime = Math.ceil(words / 200);
+  document.getElementById('wc-words').textContent = words;
+  document.getElementById('wc-chars').textContent = chars;
+  document.getElementById('wc-sentences').textContent = sentences;
+  document.getElementById('wc-read').textContent = readTime;
+}
+
+function copyOutput(id) {
+  const el = document.getElementById(id);
+  const text = el.querySelector('span').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = el.querySelector('.copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 2000);
+  });
+}
+
+function openTool(tool) {
+  document.getElementById('home-section').style.display = 'none';
+  document.getElementById(`tool-${tool}`).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function closeTool() {
+  document.querySelectorAll('.tool-page').forEach(p => p.classList.remove('active'));
+  document.getElementById('home-section').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+function showSection(section) {
+  document.getElementById('home-section').style.display = 'none';
+  document.querySelectorAll('.tool-page, .static-page').forEach(p => p.classList.remove('active'));
+  if (section === 'home') {
+    document.getElementById('home-section').style.display = 'block';
+  } else {
+    document.getElementById(`${section}-section`).classList.add('active');
+  }
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
